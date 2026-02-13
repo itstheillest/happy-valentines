@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Be My Valentine?</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #ffe6e6;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            overflow: hidden; 
+        }
+
+        h1 {
+            color: #ff4d4d;
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .container { text-align: center; }
+
+        .gif-container img {
+            width: 200px;
+            border-radius: 10px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            font-weight: bold;
+        }
+
+        #yesBtn {
+            background-color: #4CAF50; 
+            color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        #yesBtn:hover {
+            transform: scale(1.1);
+            background-color: #45a049;
+        }
+
+        #noBtn {
+            background-color: #f44336; 
+            color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        #noBtn:hover {
+            transform: scale(1.1);
+            background-color: #f44336;
+        }
+
+        /* --- MOBILE BLOCKER STYLES --- */
+        #mobile-warning {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            color: #fff;
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #mobile-warning h1 { color: #ff4d4d; font-size: 2rem; }
+        #mobile-warning p { font-size: 1.2rem; margin-top: 10px; }
+
+        @media only screen and (max-width: 1024px) {
+            #mobile-warning { display: flex !important; }
+            .container, .gallery-container, h1, h2, .buttons { display: none !important; }
+        }
+
+        /* --- TRANSITION OVERLAY --- */
+        #fade-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #050505; /* Matches memories.html background */
+            opacity: 0; /* Start invisible */
+            pointer-events: none; /* Let clicks pass through initially */
+            transition: opacity 1s ease-in-out;
+            z-index: 5000;
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="fade-overlay"></div>
+
+    <div id="mobile-warning">
+        <div class="message">
+            <h1>⚠️ Desktop Only!</h1>
+            <p>On mo ang desktop mode anteh ;3</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="gif-container">
+            <img src="/media/hehe.gif" alt="Cute Bear" style="width: 1000px;">
+        </div>
+
+        <h1 id="question">Can you be my Valentine?</h1>
+        
+        <div class="buttons">
+            <button id="yesBtn">Yes</button>
+            <button id="noBtn">No</button>
+        </div>
+    </div>
+    
+    <audio id="yesSound" src="media/voices/ping.mp3"></audio>
+    <audio id="noSound" src="media/voices/error.mp3"></audio>
+
+    <script>
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const fadeOverlay = document.getElementById('fade-overlay');
+
+        // UPDATE THESE LINES:
+        const yesSound = document.getElementById('yesSound');
+        const noSound = document.getElementById('noSound');
+
+        let noClickCount = 0;
+        const maxClicks = 9;
+
+        // --- UPDATED REDIRECT FUNCTION ---
+        function goToMemories() {
+            // Play the "Yes" sound (Ping)
+            yesSound.currentTime = 0;
+            yesSound.play();
+
+            // 1. Fade to Black
+            fadeOverlay.style.opacity = '1';
+            
+            // 2. Wait 1 second (1000ms), then load the new page
+            setTimeout(() => {
+                window.location.href = "memories.html";
+            }, 1000);
+        }
+
+        yesBtn.addEventListener('click', goToMemories);
+
+        noBtn.addEventListener('click', () => {
+            noSound.currentTime = 0; 
+            noSound.play();
+            noClickCount++;
+
+            if (noClickCount < maxClicks) {
+                const windowWidth = window.innerWidth;
+                const windowHeight = window.innerHeight;
+                const btnWidth = noBtn.offsetWidth;
+                const btnHeight = noBtn.offsetHeight;
+
+                const randomX = Math.random() * (windowWidth - btnWidth);
+                const randomY = Math.random() * (windowHeight - btnHeight);
+
+                noBtn.style.position = 'absolute';
+                noBtn.style.left = randomX + 'px';
+                noBtn.style.top = randomY + 'px';
+            } else {
+                noBtn.style.position = 'static'; 
+                noBtn.innerText = "Yes";
+                noBtn.style.backgroundColor = "#4CAF50"; 
+                noBtn.onclick = goToMemories;
+            }
+        });
+    </script>
+</body>
+</html>

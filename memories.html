@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Memories</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
+        /* --- GENERAL STYLES --- */
+        body {
+            background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('media/bg.jpg');
+            
+            /* This makes sure the image covers the whole screen */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed; /* Keeps bg still while scrolling */
+
+            color: #eceff1;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            perspective: 2500px;
+        }
+
+        h2 {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            text-align: center;
+            font-family: 'Great Vibes', cursive; 
+            font-size: 3rem; 
+            font-weight: normal; /* Cursive doesn't usually need bold */
+            color: #eceff1;
+            z-index: 100;
+            pointer-events: none;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5); /* Makes it pop against dark bg */
+        }
+        
+        h2 span { color: #ff4d4d; }
+
+        /* --- 3D CAROUSEL --- */
+        .gallery-container {
+            position: relative;
+            width: 300px;
+            height: 450px;
+            transform-style: preserve-3d;
+            cursor: grab;
+            z-index: 10;
+        }
+
+        .gallery-container:active { cursor: grabbing; }
+
+        .card {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 1.5em;
+            box-sizing: border-box;
+            display: grid;
+            grid-template-rows: auto auto 1fr auto;
+            gap: 0.5em;
+            user-select: none;
+            -webkit-user-select: none;
+            backface-visibility: hidden; 
+        }
+
+        .card-image {
+            width: 100%;
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer; 
+            transition: transform 0.2s;
+        }
+
+        .card-image:hover {
+            transform: scale(1.02);
+            border-color: #fff;
+        }
+
+        .card h3 { margin: 0; font-size: 1.5em; font-weight: 600; color: #fff; }
+        .card p.date { margin: 0; color: #aaa; font-size: 0.9rem; }
+        .card p.description { color: #ddd; font-size: 0.95rem; line-height: 1.4; }
+
+        /* The Button */
+        .cta {
+            display: block;
+            width: 100%;
+            padding: 10px 0;
+            text-align: center;
+            border-radius: 50px;
+            text-decoration: none;
+            color: #fff;
+            font-weight: bold;
+            margin-top: auto;
+            background-color: hsl(var(--hue), var(--saturation), var(--lightness));
+            box-shadow: 0 0 10px hsl(var(--hue), var(--saturation), var(--lightness), 0.5);
+            cursor: pointer;
+        }
+
+        .card:nth-child(1) { --hue: 340; --saturation: 80%; --lightness: 60%; }
+        .card:nth-child(2) { --hue: 200; --saturation: 80%; --lightness: 60%; }
+        .card:nth-child(3) { --hue: 150; --saturation: 70%; --lightness: 50%; }
+        .card:nth-child(4) { --hue: 40;  --saturation: 90%; --lightness: 60%; }
+        .card:nth-child(5) { --hue: 280; --saturation: 70%; --lightness: 65%; }
+        .card:nth-child(6) { --hue: 10;  --saturation: 80%; --lightness: 60%; }
+        .card:nth-child(7) { --hue: 340; --saturation: 80%; --lightness: 60%; }
+        .card:nth-child(8) { --hue: 200; --saturation: 80%; --lightness: 60%; }
+        .card:nth-child(9) { --hue: 150; --saturation: 70%; --lightness: 50%; }
+        .card:nth-child(10) { --hue: 40;  --saturation: 90%; --lightness: 60%; }
+        .card:nth-child(11) { --hue: 280; --saturation: 70%; --lightness: 65%; }
+        .card:nth-child(12) { --hue: 10;  --saturation: 80%; --lightness: 60%; }
+        .card:nth-child(13) { --hue: 280; --saturation: 70%; --lightness: 65%; }
+
+        /* --- LIGHTBOX (IMAGE) --- */
+        #lightbox {
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 6000;
+            justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        #lightbox.active { display: flex; opacity: 1; }
+        #lightbox img {
+            max-width: 90%; max-height: 90%; border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        /* --- MESSAGE MODAL (TEXT) --- */
+        #msg-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.8); /* Dark overlay */
+            z-index: 7000; /* Higher than lightbox */
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #msg-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .msg-box {
+            background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 80%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        #msg-modal.active .msg-box {
+            transform: translateY(0);
+        }
+
+        .msg-box h3 {
+            color: #ff4d4d;
+            margin-top: 0;
+            font-size: 1.8rem;
+        }
+
+        .msg-box p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #ddd;
+        }
+
+        .close-btn {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .close-btn:hover { background-color: #d32f2f; }
+
+        /* --- MOBILE BLOCKER --- */
+        #mobile-warning {
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #000; color: #fff; z-index: 9999;
+            justify-content: center; align-items: center; text-align: center; padding: 20px;
+        }
+        #mobile-warning h1 { color: #ff4d4d; font-size: 2rem; }
+        @media only screen and (max-width: 1024px) {
+            #mobile-warning { display: flex !important; }
+            .container, .gallery-container, h1, h2, .buttons { display: none !important; }
+        }
+
+        /* --- FADE OVERLAY --- */
+        #fade-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #050505; opacity: 1; pointer-events: none;
+            transition: opacity 1.5s ease-in-out; z-index: 5000;
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="fade-overlay"></div>
+    <div id="mobile-warning">
+        <div class="message">
+            <h1>⚠️ Desktop Only!</h1>
+            <p>On mo ang desktop mode anteh ;3</p>
+        </div>
+    </div>
+
+    <div id="lightbox">
+        <img id="lightbox-img" src="" alt="Full Memory">
+    </div>
+
+    <div id="msg-modal">
+        <div class="msg-box">
+            <h3 id="msg-title">Our Memory</h3>
+            <p id="msg-text">Default text...</p>
+            <button class="close-btn" id="close-msg-btn">Close Note</button>
+        </div>
+    </div>
+
+    <h2>Reminisce the Past and Living the Present. Eagerly waiting, for the future <span>❤️</span></h2>
+
+    <div class="gallery-container">
+        <div class="card">
+            <div class="card-image" style="background-image: url('media/photos/1.jpg');"></div>
+            <h3>Landian sa Discord HAHAHAHA</h3>
+            <p class="date">October 23, 2021</p>
+            
+            <a class="cta" data-note="Grabeeeeeeee ang landi. Isa to sa mga natitirang picture natin though messages lng, hey, it's still between us HEHE.">Read Note</a>
+        </div>
+
+        <div class="card">
+            <div class="card-image" style="background-image: url('media/photos/2.jpg');"></div>
+            <h3>Picture sa likod ng classroom</h3>
+            <p class="date">Unknown Date</p>
+            
+            <a class="cta" data-note="Actually, isang araw, sinend lng sakin to ni Janna. Nagulat din ako eh. Edi sinave ko agad HAHAHAHAHAHAHA. 
+            Tinanong nya ako kung kamusta na tayo and I simply said that we're keeping it stable HAHAHAHAHAHAHA. 
+            I think may pinagdadaanan tayo at this time tapos sakto ang timing ng send ni Janna HAHAHAHAHAHAHAHAHA.
+            Pero anyways, It's not all the time na meron pa pala tayong lost picture together.
+            I'm glad I found this image again saved in the crevices of my phone. Another memory partially unlocked HAHAHAHAHAHEHE">Read Note</a>
+        </div>
+
+        <div class="card">
+            <div class="card-image" style="background-image: url('media/photos/3.jpg');"></div>
+            <h3>Marriage Certificate</h3>
+            <p class="date">July 29, 2023</p>
+            
+            <a class="cta" data-note="WOWWWWWWWWWWWWWWWW. So cute. I don't have much to say. It's adorable and I kept it with me for as long as I had it. Never letting it go.">Read Note</a>
+        </div>
+
+        <div class="card">
+            <div class="card-image" style="background-image: url('media/photos/4.jpg');"></div>
+            <h3>Immersion sa Perps</h3>
+            <p class="date">August 1, 2023</p>
+            
+            <a class="cta" data-note="Dito talaga sa perps tayo nagsimula eh HAHAHAHAHA. Sunod ako ng sunod sayo. Tapos ung sa library pa, I loved sitting alongside with you. 
+            I was looking forward to every moment that we had in Perps especially ung moments that we can be together by each other's side HEHEHEHEHEEHEH.">Read Note</a>
+        </div>
+
+        <div class="card">
+            <div class="card-image" style="background-image: url('media/photos/5.jpg');"></div>
+            <h3>Before and After</h3>
+            <p class="date">August 29, 2023</p>
+            
+            <a class="cta" data-note="Grabe, nakalingon pa ako. Tapos noh, naging super clingy din naman HAHAHAHAHAHAHA.">Read Note</a>
+        </div>
+         
+        <div class="card">
+            <div class="card-image" style="background-image: url('media/photos/6.jpg');"></div>
+            <h3>❤️ Heart sa Classroom</h3>
+            <p class="date">September 5, 2023</p>
+            
+            <a class="cta" data-note="Medyo malabo labo na talaga ang naaalala ko dito. It's been so long. I'm pretty sure na baka mali din ung date na nalagay ko dahil saved image lng to. 
+            Pero anyways. Grabe ung SHS dayas natin HAHAHAHAAHAHAHA. Dito nangyari ang madaming firsts. Dito din talaga natuluyang mabuo ang ating pagmamahalan HUYYYYYYYYYYYYYYYYYYYYYY">Read Note</a>
+        </div>
+
+        <div class="card">
+            <div class="card-image" style="background-image: url('media/photos/7.jpg');"></div>
+            <h3>First meet sa PUP (ata?)</h3>
+            <p class="date">September 26, 2023</p>
+            
+            <a class="cta" data-note="UYYYYYYYYYYY first meet up sa PUP. If tama ang naaalala ko. Doon to sa 2nd floor malapit sa student services. 
+            Sinamahan kita dahil may kukunin ka atang documents from school. I don't remember which one exactly but hey. HEHE.
+            Alam ko ito pa ata ung ini-ignore mo ako eh HAHAHAHAHAHA tapos nung nasa 2nd floor na tayo, lumambot na HEHE">Read Note</a>
+        </div>
+
+        <div class="card">
+            <div class="card-image" style="background-image: url('media/photos/8.jpg');"></div>
+            <h3>Second meet sa PUP</h3>
+            <p class="date">October 3, 2023</p>
+            
+            <a class="cta" data-note="For the first time, meron na talagang klase. Kaya naka white tshirt tayo, wala pa tayo uniform nito eh. 
+            Though, di ko maaalala what exactly happened HAHAHAHAHAHAHA">Read Note</a>
+        </div>
+
+        <div class="card">
+            <div class="card-image" style="background-image: url('media/photos/9.jpg');"></div>
+            <h3>Montage/Collage of Pictures</h3>
+            <p class="date">December 6, 2024</p>
+            
+            <a class="cta" data-note="I found this in my Picsart folder. I'm surprised I even found it. 
+            There's so many pictures here that I can't find in my phone anymore :<
+            Very unfortunate :<<<<">Read Note</a>
+        </div>
+
+        <div class="card">
+            <div class="card-image" style="background-image: url('media/photos/10.jpg');"></div>
+            <h3>Sarap ng higa ko</h3>
+            <p class="date">January 17, 2025</p>
+            
+            <a class="cta" data-note="UYYYYYYYYYYYYY. Grabe to, ang pukso. Sa court pa talaga ng PUP. 
+            Alam ko nakigaya lng tayo dito doon sa nakita natin sa harap eh. Ung lalake, nakahiga din sa hita ng babae HAHAHAHAHAHAHA">Read Note</a>
+        </div>
+
+        <div class="card">
+            <div class="card-image" style="background-image: url('media/photos/11.jpg');"></div>
+            <h3>Picture picture sa Court ng PUP dahil namimiss na ang isa't isa</h3>
+            <p class="date">January 20, 2025</p>
+            
+            <a class="cta" data-note="I couldn't get m yself to delete this one and the few other pictures. 
+            Super cute natin dito kaso di ko mahanap na ung picture na hinila kita HAHAHAHAHAHAHA.
+            Yun sana ilalagay ko kaso na-delete ko na ata :<">Read Note</a>
+        </div>
+         
+        <div class="card">
+            <div class="card-image" style="background-image: url('media/photos/12.jpg');"></div>
+            <h3>New phone (ata?)</h3>
+            <p class="date">May 20, 2025</p>
+            
+            <a class="cta" data-note="I think, ito ung meron akong bagong phone. Ata, di ko maalala ang backstory ng picture na to HAHAHAHAHAHA. 
+            Anyways, ang cute natin dito HEHEHEHEHE ">Read Note</a>
+        </div>
+
+        <div class="card">
+            <div class="card-image" style="background-image: url('media/photos/13.jpg');"></div>
+            <h3>Uwian after lumafang sa PUP</h3>
+            <p class="date">February 10, 2026</p>
+            
+            <a class="cta" data-note="Welp, this is the most recent photo that I have. Though it's just a picture of you. 
+            Most of the pictures here ay ung mga natitira nalang talaga after nag delete ako ng mga pictures natin. I probably, either, left them on purpose or nakaligtaan ko.
+        
+            I hope that you liked my small Valentine's gift antehhhhh. I wish I can do more but this is what I had in mind recently HEHE.">Read Note</a>
+        </div>
+    </div>
+
+    <script>
+        // --- PAGE FADE IN ---
+        window.onload = function() {
+            const fadeOverlay = document.getElementById('fade-overlay');
+            if(fadeOverlay) fadeOverlay.style.opacity = '0';
+        };
+
+        // --- CAROUSEL LOGIC ---
+        const container = document.querySelector('.gallery-container');
+        const cards = document.querySelectorAll('.card');
+        const numCards = cards.length;
+        // 1. Define the size of your cards + the gap you want
+        const cardWidth = 300; // Must match your CSS .card width
+        const gap = 40;        // Space between cards
+
+        // 2. Calculate the radius dynamically
+        // Math: Circumference = numCards * (width + gap)
+        // Radius = Circumference / 2π
+        const radius = (numCards * (cardWidth + gap)) / (2 * Math.PI);
+
+        const angleStep = 360 / numCards;
+
+        cards.forEach((card, index) => {
+            const angle = index * angleStep;
+            gsap.set(card, {
+                rotationY: angle,
+                z: radius, // Push it out by the calculated radius
+                
+                // IMPORTANT: Use backticks (`) here, not single quotes (')
+                // This sets the pivot point to the center of the ring
+                transformOrigin: `50% 50% ${-radius}px` 
+            });
+        });
+
+        // --- DRAG LOGIC ---
+        let startX = 0;
+        let currentRotation = 0;
+        let isDragging = false;
+        let isActuallyDragging = false;
+
+        document.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            isActuallyDragging = false;
+            startX = e.clientX;
+            container.style.cursor = "grabbing";
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            container.style.cursor = "grab";
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            if (Math.abs(e.clientX - startX) > 5) isActuallyDragging = true;
+            
+            const deltaX = e.clientX - startX;
+            const rotationAmount = deltaX * 0.5; 
+            gsap.to(container, {
+                rotationY: currentRotation + rotationAmount,
+                duration: 0.5,
+                ease: "power1.out"
+            });
+            currentRotation += rotationAmount;
+            startX = e.clientX;
+        });
+
+        gsap.from(container, { rotationY: -180, duration: 2, ease: "power2.out" });
+
+        // --- LIGHTBOX (IMAGE) LOGIC ---
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const cardImages = document.querySelectorAll('.card-image');
+
+        cardImages.forEach(imageDiv => {
+            imageDiv.addEventListener('click', () => {
+                if (isActuallyDragging) return;
+                const style = window.getComputedStyle(imageDiv);
+                const url = style.backgroundImage.slice(5, -2); 
+                lightboxImg.src = url;
+                lightbox.style.display = 'flex';
+                setTimeout(() => lightbox.classList.add('active'), 10);
+            });
+        });
+
+        lightbox.addEventListener('click', () => {
+            lightbox.classList.remove('active');
+            setTimeout(() => lightbox.style.display = 'none', 300);
+        });
+
+        // --- MESSAGE MODAL (NOTE) LOGIC ---
+        const msgModal = document.getElementById('msg-modal');
+        const msgTitle = document.getElementById('msg-title');
+        const msgText = document.getElementById('msg-text');
+        const closeMsgBtn = document.getElementById('close-msg-btn');
+        const ctaButtons = document.querySelectorAll('.cta');
+
+        ctaButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // Prevent the click from affecting the drag logic
+                e.stopPropagation(); 
+                
+                // 1. Get the note content from the data-attribute
+                const note = btn.getAttribute('data-note');
+                // 2. Get the title from the card (h3 sibling)
+                const title = btn.parentElement.querySelector('h3').innerText;
+
+                // 3. Set content
+                msgTitle.innerText = title;
+                msgText.innerText = note;
+
+                // 4. Show modal
+                msgModal.style.display = 'flex';
+                setTimeout(() => msgModal.classList.add('active'), 10);
+            });
+        });
+
+        // Close functions
+        function closeMsg() {
+            msgModal.classList.remove('active');
+            setTimeout(() => msgModal.style.display = 'none', 300);
+        }
+
+        closeMsgBtn.addEventListener('click', closeMsg);
+        msgModal.addEventListener('click', (e) => {
+            if (e.target === msgModal) closeMsg();
+        });
+
+    </script>
+</body>
+</html>

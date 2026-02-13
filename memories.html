@@ -179,6 +179,15 @@
             background-color: #050505; opacity: 1; pointer-events: none;
             transition: opacity 1.5s ease-in-out; z-index: 5000;
         }
+
+        #lightbox.active ~ .gallery-container,
+        #msg-modal.active ~ .gallery-container,
+        #lightbox.active ~ h2,
+        #msg-modal.active ~ h2 {
+            opacity: 0;
+            pointer-events: none; /* Disables clicking cards while hidden */
+            transition: opacity 0.3s ease;
+        }
     </style>
 </head>
 <body>

@@ -10,21 +10,35 @@
         
         /* --- GENERAL STYLES --- */
         body {
+            /* Background stays on the body */
             background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('media/bg.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
+            
             color: #eceff1;
             font-family: 'Arial', sans-serif;
             margin: 0;
-            overflow: hidden;
+            
+            /* Important: Body is no longer the 3D container */
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden; /* Prevents scrollbars */
+        }
+
+        /* --- NEW SCENE WRAPPER --- */
+        /* This contains the 3D elements and stops them from messing up the page width */
+        .scene {
+            width: 100%;
+            height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            perspective: 2500px;
+            perspective: 2500px; /* The 3D depth lives here now */
+            overflow: hidden; /* Clips any 3D cards poking out too far */
+            position: relative;
         }
 
         h2 {
@@ -97,7 +111,7 @@
         .card p.date { margin: 0; color: #aaa; font-size: 0.9rem; }
         .card p.description { color: #ddd; font-size: 0.95rem; line-height: 1.4; }
 
-        /* --- BUTTON STYLES (Updated to be <button>) --- */
+        /* --- BUTTON STYLES --- */
         .cta {
             display: block;
             width: 100%;
@@ -111,7 +125,6 @@
             background-color: hsl(var(--hue), var(--saturation), var(--lightness));
             box-shadow: 0 0 10px hsl(var(--hue), var(--saturation), var(--lightness), 0.5);
             cursor: pointer;
-            /* Button Reset Styles */
             border: none;
             font-family: inherit;
             font-size: 1rem;
@@ -179,15 +192,6 @@
             background-color: #050505; opacity: 1; pointer-events: none;
             transition: opacity 1.5s ease-in-out; z-index: 5000;
         }
-
-        #lightbox.active ~ .gallery-container,
-        #msg-modal.active ~ .gallery-container,
-        #lightbox.active ~ h2,
-        #msg-modal.active ~ h2 {
-            opacity: 0;
-            pointer-events: none; /* Disables clicking cards while hidden */
-            transition: opacity 0.3s ease;
-        }
     </style>
 </head>
 <body>
@@ -206,98 +210,100 @@
         </div>
     </div>
 
-    <h2>Reminisce the Past and Living the Present. Eagerly waiting, for the future <span>❤️</span></h2>
+    <div class="scene">
+        <h2>Reminisce the Past and Living the Present. Eagerly waiting, for the future <span>❤️</span></h2>
 
-    <div class="gallery-container">
-        <div class="card">
-            <div class="card-image" style="background-image: url('media/photos/1.jpg');"></div>
-            <h3>Landian sa Discord HAHAHAHA</h3>
-            <p class="date">October 23, 2021</p>
-            <button class="cta" data-note="Grabeeeeeeee ang landi. Isa to sa mga natitirang picture natin though messages lng, hey, it's still between us HEHE.">Read Note</button>
-        </div>
+        <div class="gallery-container">
+            <div class="card">
+                <div class="card-image" style="background-image: url('media/photos/1.jpg');"></div>
+                <h3>Landian sa Discord HAHAHAHA</h3>
+                <p class="date">October 23, 2021</p>
+                <button class="cta" data-note="Grabeeeeeeee ang landi. Isa to sa mga natitirang picture natin though messages lng, hey, it's still between us HEHE.">Read Note</button>
+            </div>
 
-        <div class="card">
-            <div class="card-image" style="background-image: url('media/photos/2.jpg');"></div>
-            <h3>Picture sa likod ng classroom</h3>
-            <p class="date">Unknown Date</p>
-            <button class="cta" data-note="Actually, isang araw, sinend lng sakin to ni Janna. Nagulat din ako eh. Edi sinave ko agad HAHAHAHAHAHAHA. Tinanong nya ako kung kamusta na tayo and I simply said that we're keeping it stable HAHAHAHAHAHAHA. I think may pinagdadaanan tayo at this time tapos sakto ang timing ng send ni Janna HAHAHAHAHAHAHAHAHA. Pero anyways, It's not all the time na meron pa pala tayong lost picture together. I'm glad I found this image again saved in the crevices of my phone. Another memory partially unlocked HAHAHAHAHAHEHE">Read Note</button>
-        </div>
+            <div class="card">
+                <div class="card-image" style="background-image: url('media/photos/2.jpg');"></div>
+                <h3>Picture sa likod ng classroom</h3>
+                <p class="date">Unknown Date</p>
+                <button class="cta" data-note="Actually, isang araw, sinend lng sakin to ni Janna. Nagulat din ako eh. Edi sinave ko agad HAHAHAHAHAHAHA. Tinanong nya ako kung kamusta na tayo and I simply said that we're keeping it stable HAHAHAHAHAHAHA. I think may pinagdadaanan tayo at this time tapos sakto ang timing ng send ni Janna HAHAHAHAHAHAHAHAHA. Pero anyways, It's not all the time na meron pa pala tayong lost picture together. I'm glad I found this image again saved in the crevices of my phone. Another memory partially unlocked HAHAHAHAHAHEHE">Read Note</button>
+            </div>
 
-        <div class="card">
-            <div class="card-image" style="background-image: url('media/photos/3.jpg');"></div>
-            <h3>Marriage Certificate</h3>
-            <p class="date">July 29, 2023</p>
-            <button class="cta" data-note="WOWWWWWWWWWWWWWWWW. So cute. I don't have much to say. It's adorable and I kept it with me for as long as I had it. Never letting it go.">Read Note</button>
-        </div>
+            <div class="card">
+                <div class="card-image" style="background-image: url('media/photos/3.jpg');"></div>
+                <h3>Marriage Certificate</h3>
+                <p class="date">July 29, 2023</p>
+                <button class="cta" data-note="WOWWWWWWWWWWWWWWWW. So cute. I don't have much to say. It's adorable and I kept it with me for as long as I had it. Never letting it go.">Read Note</button>
+            </div>
 
-        <div class="card">
-            <div class="card-image" style="background-image: url('media/photos/4.jpg');"></div>
-            <h3>Immersion sa Perps</h3>
-            <p class="date">August 1, 2023</p>
-            <button class="cta" data-note="Dito talaga sa perps tayo nagsimula eh HAHAHAHAHA. Sunod ako ng sunod sayo. Tapos ung sa library pa, I loved sitting alongside with you. I was looking forward to every moment that we had in Perps especially ung moments that we can be together by each other's side HEHEHEHEHEEHEH.">Read Note</button>
-        </div>
+            <div class="card">
+                <div class="card-image" style="background-image: url('media/photos/4.jpg');"></div>
+                <h3>Immersion sa Perps</h3>
+                <p class="date">August 1, 2023</p>
+                <button class="cta" data-note="Dito talaga sa perps tayo nagsimula eh HAHAHAHAHA. Sunod ako ng sunod sayo. Tapos ung sa library pa, I loved sitting alongside with you. I was looking forward to every moment that we had in Perps especially ung moments that we can be together by each other's side HEHEHEHEHEEHEH.">Read Note</button>
+            </div>
 
-        <div class="card">
-            <div class="card-image" style="background-image: url('media/photos/5.jpg');"></div>
-            <h3>Before and After</h3>
-            <p class="date">August 29, 2023</p>
-            <button class="cta" data-note="Grabe, nakalingon pa ako. Tapos noh, naging super clingy din naman HAHAHAHAHAHAHA.">Read Note</button>
-        </div>
-         
-        <div class="card">
-            <div class="card-image" style="background-image: url('media/photos/6.jpg');"></div>
-            <h3>❤️ Heart sa Classroom</h3>
-            <p class="date">September 5, 2023</p>
-            <button class="cta" data-note="Medyo malabo labo na talaga ang naaalala ko dito. It's been so long. I'm pretty sure na baka mali din ung date na nalagay ko dahil saved image lng to. Pero anyways. Grabe ung SHS dayas natin HAHAHAHAAHAHAHA. Dito nangyari ang madaming firsts. Dito din talaga natuluyang mabuo ang ating pagmamahalan HUYYYYYYYYYYYYYYYYYYYYYY">Read Note</button>
-        </div>
+            <div class="card">
+                <div class="card-image" style="background-image: url('media/photos/5.jpg');"></div>
+                <h3>Before and After</h3>
+                <p class="date">August 29, 2023</p>
+                <button class="cta" data-note="Grabe, nakalingon pa ako. Tapos noh, naging super clingy din naman HAHAHAHAHAHAHA.">Read Note</button>
+            </div>
+             
+            <div class="card">
+                <div class="card-image" style="background-image: url('media/photos/6.jpg');"></div>
+                <h3>❤️ Heart sa Classroom</h3>
+                <p class="date">September 5, 2023</p>
+                <button class="cta" data-note="Medyo malabo labo na talaga ang naaalala ko dito. It's been so long. I'm pretty sure na baka mali din ung date na nalagay ko dahil saved image lng to. Pero anyways. Grabe ung SHS dayas natin HAHAHAHAAHAHAHA. Dito nangyari ang madaming firsts. Dito din talaga natuluyang mabuo ang ating pagmamahalan HUYYYYYYYYYYYYYYYYYYYYYY">Read Note</button>
+            </div>
 
-        <div class="card">
-            <div class="card-image" style="background-image: url('media/photos/7.jpg');"></div>
-            <h3>First meet sa PUP (ata?)</h3>
-            <p class="date">September 26, 2023</p>
-            <button class="cta" data-note="UYYYYYYYYYYY first meet up sa PUP. If tama ang naaalala ko. Doon to sa 2nd floor malapit sa student services. Sinamahan kita dahil may kukunin ka atang documents from school. I don't remember which one exactly but hey. HEHE. Alam ko ito pa ata ung ini-ignore mo ako eh HAHAHAHAHAHA tapos nung nasa 2nd floor na tayo, lumambot na HEHE">Read Note</button>
-        </div>
+            <div class="card">
+                <div class="card-image" style="background-image: url('media/photos/7.jpg');"></div>
+                <h3>First meet sa PUP (ata?)</h3>
+                <p class="date">September 26, 2023</p>
+                <button class="cta" data-note="UYYYYYYYYYYY first meet up sa PUP. If tama ang naaalala ko. Doon to sa 2nd floor malapit sa student services. Sinamahan kita dahil may kukunin ka atang documents from school. I don't remember which one exactly but hey. HEHE. Alam ko ito pa ata ung ini-ignore mo ako eh HAHAHAHAHAHA tapos nung nasa 2nd floor na tayo, lumambot na HEHE">Read Note</button>
+            </div>
 
-        <div class="card">
-            <div class="card-image" style="background-image: url('media/photos/8.jpg');"></div>
-            <h3>Second meet sa PUP</h3>
-            <p class="date">October 3, 2023</p>
-            <button class="cta" data-note="For the first time, meron na talagang klase. Kaya naka white tshirt tayo, wala pa tayo uniform nito eh. Though, di ko maaalala what exactly happened HAHAHAHAHAHAHA">Read Note</button>
-        </div>
+            <div class="card">
+                <div class="card-image" style="background-image: url('media/photos/8.jpg');"></div>
+                <h3>Second meet sa PUP</h3>
+                <p class="date">October 3, 2023</p>
+                <button class="cta" data-note="For the first time, meron na talagang klase. Kaya naka white tshirt tayo, wala pa tayo uniform nito eh. Though, di ko maaalala what exactly happened HAHAHAHAHAHAHA">Read Note</button>
+            </div>
 
-        <div class="card">
-            <div class="card-image" style="background-image: url('media/photos/9.jpg');"></div>
-            <h3>Montage/Collage of Pictures</h3>
-            <p class="date">December 6, 2024</p>
-            <button class="cta" data-note="I found this in my Picsart folder. I'm surprised I even found it. There's so many pictures here that I can't find in my phone anymore :< Very unfortunate :<<<<">Read Note</button>
-        </div>
+            <div class="card">
+                <div class="card-image" style="background-image: url('media/photos/9.jpg');"></div>
+                <h3>Montage/Collage of Pictures</h3>
+                <p class="date">December 6, 2024</p>
+                <button class="cta" data-note="I found this in my Picsart folder. I'm surprised I even found it. There's so many pictures here that I can't find in my phone anymore :< Very unfortunate :<<<<">Read Note</button>
+            </div>
 
-        <div class="card">
-            <div class="card-image" style="background-image: url('media/photos/10.jpg');"></div>
-            <h3>Sarap ng higa ko</h3>
-            <p class="date">January 17, 2025</p>
-            <button class="cta" data-note="UYYYYYYYYYYYYY. Grabe to, ang pukso. Sa court pa talaga ng PUP. Alam ko nakigaya lng tayo dito doon sa nakita natin sa harap eh. Ung lalake, nakahiga din sa hita ng babae HAHAHAHAHAHAHA">Read Note</button>
-        </div>
+            <div class="card">
+                <div class="card-image" style="background-image: url('media/photos/10.jpg');"></div>
+                <h3>Sarap ng higa ko</h3>
+                <p class="date">January 17, 2025</p>
+                <button class="cta" data-note="UYYYYYYYYYYYYY. Grabe to, ang pukso. Sa court pa talaga ng PUP. Alam ko nakigaya lng tayo dito doon sa nakita natin sa harap eh. Ung lalake, nakahiga din sa hita ng babae HAHAHAHAHAHAHA">Read Note</button>
+            </div>
 
-        <div class="card">
-            <div class="card-image" style="background-image: url('media/photos/11.jpg');"></div>
-            <h3>Picture picture sa Court ng PUP dahil namimiss na ang isa't isa</h3>
-            <p class="date">January 20, 2025</p>
-            <button class="cta" data-note="I couldn't get m yself to delete this one and the few other pictures. Super cute natin dito kaso di ko mahanap na ung picture na hinila kita HAHAHAHAHAHAHA. Yun sana ilalagay ko kaso na-delete ko na ata :<">Read Note</button>
-        </div>
-         
-        <div class="card">
-            <div class="card-image" style="background-image: url('media/photos/12.jpg');"></div>
-            <h3>New phone (ata?)</h3>
-            <p class="date">May 20, 2025</p>
-            <button class="cta" data-note="I think, ito ung meron akong bagong phone. Ata, di ko maalala ang backstory ng picture na to HAHAHAHAHAHA. Anyways, ang cute natin dito HEHEHEHEHE ">Read Note</button>
-        </div>
+            <div class="card">
+                <div class="card-image" style="background-image: url('media/photos/11.jpg');"></div>
+                <h3>Picture picture sa Court ng PUP dahil namimiss na ang isa't isa</h3>
+                <p class="date">January 20, 2025</p>
+                <button class="cta" data-note="I couldn't get m yself to delete this one and the few other pictures. Super cute natin dito kaso di ko mahanap na ung picture na hinila kita HAHAHAHAHAHAHA. Yun sana ilalagay ko kaso na-delete ko na ata :<">Read Note</button>
+            </div>
+             
+            <div class="card">
+                <div class="card-image" style="background-image: url('media/photos/12.jpg');"></div>
+                <h3>New phone (ata?)</h3>
+                <p class="date">May 20, 2025</p>
+                <button class="cta" data-note="I think, ito ung meron akong bagong phone. Ata, di ko maalala ang backstory ng picture na to HAHAHAHAHAHA. Anyways, ang cute natin dito HEHEHEHEHE ">Read Note</button>
+            </div>
 
-        <div class="card">
-            <div class="card-image" style="background-image: url('media/photos/13.jpg');"></div>
-            <h3>Uwian after lumafang sa PUP</h3>
-            <p class="date">February 10, 2026</p>
-            <button class="cta" data-note="Welp, this is the most recent photo that I have. Though it's just a picture of you. Most of the pictures here ay ung mga natitira nalang talaga after nag delete ako ng mga pictures natin. I probably, either, left them on purpose or nakaligtaan ko. I hope that you liked my small Valentine's gift antehhhhh. I wish I can do more but this is what I had in mind recently HEHE.">Read Note</button>
+            <div class="card">
+                <div class="card-image" style="background-image: url('media/photos/13.jpg');"></div>
+                <h3>Uwian after lumafang sa PUP</h3>
+                <p class="date">February 10, 2026</p>
+                <button class="cta" data-note="Welp, this is the most recent photo that I have. Though it's just a picture of you. Most of the pictures here ay ung mga natitira nalang talaga after nag delete ako ng mga pictures natin. I probably, either, left them on purpose or nakaligtaan ko. I hope that you liked my small Valentine's gift antehhhhh. I wish I can do more but this is what I had in mind recently HEHE.">Read Note</button>
+            </div>
         </div>
     </div>
 
@@ -328,10 +334,10 @@
             });
         });
 
-        // --- FIXED DRAG LOGIC (No Jumping) ---
+        // --- DRAG LOGIC ---
         let startX = 0;
-        let startRotation = 0; // Stores rotation when you START dragging
-        let currentRotation = 0; // Stores the live rotation
+        let startRotation = 0; 
+        let currentRotation = 0; 
         let isDragging = false;
         let isActuallyDragging = false;
 
@@ -339,7 +345,7 @@
             isDragging = true;
             isActuallyDragging = false;
             startX = clientX;
-            startRotation = currentRotation; // Lock in the starting angle
+            startRotation = currentRotation; 
             container.style.cursor = "grabbing";
         }
 
@@ -348,7 +354,7 @@
             const deltaX = clientX - startX;
             if(Math.abs(deltaX) > 5) isActuallyDragging = true;
             
-            // Logic: Start Position + Drag Distance * Sensitivity
+            // SENSITIVITY: Lowered to 0.15 for smoother/heavier feel
             const sensitivity = 0.15;
             currentRotation = startRotation + (deltaX * sensitivity);
 
@@ -362,28 +368,18 @@
             container.style.cursor = "grab";
         }
 
-        // MOUSE EVENTS
-        container.addEventListener('mousedown', (e) => {
-            e.preventDefault(); // Prevents text selection
-            handleStart(e.clientX);
-        });
+        container.addEventListener('mousedown', (e) => { e.preventDefault(); handleStart(e.clientX); });
         window.addEventListener('mousemove', (e) => handleMove(e.clientX));
         window.addEventListener('mouseup', handleEnd);
 
-        // TOUCH EVENTS
-        container.addEventListener('touchstart', (e) => {
-            handleStart(e.touches[0].clientX);
-        });
-        window.addEventListener('touchmove', (e) => {
-            handleMove(e.touches[0].clientX);
-        }, { passive: false });
+        container.addEventListener('touchstart', (e) => { handleStart(e.touches[0].clientX); });
+        window.addEventListener('touchmove', (e) => { handleMove(e.touches[0].clientX); }, { passive: false });
         window.addEventListener('touchend', handleEnd);
 
         // Initial Spin
         gsap.from(container, { rotationY: -180, duration: 2, ease: "power2.out" });
 
-
-        // --- MODAL & LIGHTBOX LOGIC ---
+        // --- LIGHTBOX & MODAL ---
         const lightbox = document.getElementById('lightbox');
         const lightboxImg = document.getElementById('lightbox-img');
         const cardImages = document.querySelectorAll('.card-image');
